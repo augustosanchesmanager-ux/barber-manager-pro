@@ -1,0 +1,50 @@
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+ÔÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./src/components/atendimentos/checkout-form.tsx:10:1
+Export finishCheckout doesn't exist in target module
+   8 | import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+   9 | import { Separator } from "@/components/ui/separator"
+> 10 | import { finishCheckout } from "@/app/(app)/atendimentos/actions"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11 | import { Badge } from "@/components/ui/badge"
+  12 | import { formatCurrency } from "@/lib/utils"
+  13 |
+
+The export finishCheckout was not found in module [project]/src/app/(app)/atendimentos/actions.ts [app-client] (ecmascript).
+Did you mean to import getAtendimentosHistory?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./src/components/atendimentos/checkout-form.tsx
+    ./src/app/(app)/atendimentos/[id]/checkout/page.tsx
+
+
+./src/components/atendimentos/checkout-form.tsx:10:1
+Export finishCheckout doesn't exist in target module
+   8 | import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+   9 | import { Separator } from "@/components/ui/separator"
+> 10 | import { finishCheckout } from "@/app/(app)/atendimentos/actions"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11 | import { Badge } from "@/components/ui/badge"
+  12 | import { formatCurrency } from "@/lib/utils"
+  13 |
+
+The export finishCheckout was not found in module [project]/src/app/(app)/atendimentos/actions.ts [app-ssr] (ecmascript).
+Did you mean to import getAtendimentosHistory?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./src/components/atendimentos/checkout-form.tsx
+    ./src/app/(app)/atendimentos/[id]/checkout/page.tsx
+
+
+    at <unknown> (./src/components/atendimentos/checkout-form.tsx:10:1)
+    at <unknown> (./src/components/atendimentos/checkout-form.tsx:10:1)

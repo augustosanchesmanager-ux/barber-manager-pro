@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Core Models
+
+model Barbershop {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  address   String?
+  phone     String?
+  isActive  Boolean  @default(false)
+  planType  String   @default("BASIC") // BASIC | PROFESSIONAL | ENTERPRISE
+  billingCycle String @default("MONTHLY") // MONTHLY | ANNUAL
+  maxBarbers Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users        User[]
+  services     Service[]
+  products     Product[]
+  combos       Combo[]
+  customers    Customer[]
+  appointments Appointment[]
+  transactions Transaction[]
+  dailyCloses  DailyClose[]
+}
+
+model User {
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  password     String     // Hashed password
+  role         String     @default("BARBER") // BARBER | MANAGER | SUPER_ADMIN
+  status       String     @default("PENDING") // PENDING | ACTIVE | BLOCKED
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  appointments Appointment[] // As the barber performing the service
+  dailyCloses  DailyClose[]
+}
+
+model Customer {
+  id           String     @id @default(uuid())
+  name         String
+  phone        String?
+  email        String?    // Para criação de LID/Marketing
+  birthDate    DateTime?  // Para fidelização
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  appointments Appointment[]
+}
+
+model Service {
+  id           String     @id @default(uuid())
+  name         String
+  price        Decimal
+  duration     Int        // In minutes
+  description  String?
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  
+  appointmentServices AppointmentService[]
+  comboServices       ComboService[]
+}
+
+model Product {
+  id           String     @id @default(uuid())
+  name         String
+  price        Decimal
+  quantity     Int        @default(0)
+  category     String?
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  
+  appointmentProducts AppointmentProduct[]
+  comboProducts       ComboProduct[]
+}
+
+model Combo {
+  id           String     @id @default(uuid())
+  name         String
+  price        Decimal
+  description  String?
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+  
+  services      ComboService[]
+  products      ComboProduct[]
+  appointments  Appointment[]
+}
+
+model ComboService {
+  id        String  @id @default(uuid())
+  comboId   String
+  serviceId String
+  combo     Combo   @relation(fields: [comboId], references: [id])
+  service   Service @relation(fields: [serviceId], references: [id])
+}
+
+model ComboProduct {
+  id        String  @id @default(uuid())
+  comboId   String
+  productId String
+  combo     Combo   @relation(fields: [comboId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Appointment {
+  id            String             @id @default(uuid())
+  date          DateTime
+  barberId      String
+  barber        User               @relation(fields: [barberId], references: [id])
+  customerId    String
+  customer      Customer           @relation(fields: [customerId], references: [id])
+  barbershopId  String
+  barbershop    Barbershop         @relation(fields: [barbershopId], references: [id])
+  
+  status        String             @default("SCHEDULED") // SCHEDULED | COMPLETED | CANCELLED
+  paymentStatus String             @default("PENDING") // PENDING | PAID
+  paymentMethod String?            // CASH | PIX | CREDIT_CARD | ...
+  totalPrice    Decimal
+  observation   String?
+
+  services      AppointmentService[]
+  products      AppointmentProduct[]
+  combos        Combo[]             
+  
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  
+  transaction   Transaction?
+}
+
+model AppointmentService {
+  id            String      @id @default(uuid())
+  appointmentId String
+  serviceId     String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  service       Service     @relation(fields: [serviceId], references: [id])
+  price         Decimal     // Price at the time of booking
+}
+
+model AppointmentProduct {
+  id            String      @id @default(uuid())
+  appointmentId String
+  productId     String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
+  quantity      Int         @default(1)
+  price         Decimal     // Price at time of sale
+}
+
+model Transaction {
+  id            String        @id @default(uuid())
+  appointmentId String?       @unique
+  appointment   Appointment?  @relation(fields: [appointmentId], references: [id])
+  
+  barbershopId  String
+  barbershop    Barbershop    @relation(fields: [barbershopId], references: [id])
+  
+  amount        Decimal
+  type          String        // 'INCOME' | 'EXPENSE'
+  category      String?       // 'FIXED' | 'VARIABLE' | 'PERSONAL'
+  paymentMethod String?       // 'CASH' | 'PIX' | 'CREDIT_CARD' | 'DEBIT_CARD'
+  description   String?
+  date          DateTime      @default(now())
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model DailyClose {
+  id           String     @id @default(uuid())
+  date         DateTime   @default(now())
+  
+  totalCash    Decimal    @default(0)
+  totalCard    Decimal    @default(0)
+  totalPix     Decimal    @default(0)
+  totalAmount  Decimal    @default(0)
+  
+  observations String?
+  
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id])
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}

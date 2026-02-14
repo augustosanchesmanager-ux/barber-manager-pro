@@ -29,6 +29,27 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         where: { barbershopId: session?.user.barbershopId }
     })
 
+    // Converter Decimal para number para o React
+    const productsWithNumberPrice = products.map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.price.toNumber()
+    }))
+
+    // Converter preços dos serviços no appointment e serializar Date
+    const appointmentWithNumberPrices = {
+        id: appointment.id,
+        customer: { name: appointment.customer.name },
+        barber: { name: appointment.barber.name },
+        date: appointment.date.toISOString(),
+        services: appointment.services.map(s => ({
+            price: s.price.toNumber(),
+            service: {
+                name: s.service.name
+            }
+        }))
+    }
+
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
@@ -36,8 +57,8 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
             </div>
 
             <CheckoutForm
-                appointment={appointment}
-                products={products}
+                appointment={appointmentWithNumberPrices}
+                products={productsWithNumberPrice}
             />
         </div>
     )

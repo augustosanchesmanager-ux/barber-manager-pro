@@ -13,12 +13,18 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, UserPlus, Edit2 } from "lucide-react"
+import { UserPlus } from "lucide-react"
 import { createCustomer, updateCustomer } from "@/app/(app)/clientes/actions"
 import { format } from "date-fns"
 
 interface CustomerModalProps {
-    customer?: any // Se presente, é edição
+    customer?: {
+        id: string;
+        name: string;
+        email?: string | null;
+        phone?: string | null;
+        birthDate?: string | null;
+    }
     onSuccess?: () => void
     trigger?: React.ReactNode
 }

@@ -118,7 +118,7 @@ export default async function CaixaPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {summary!.transactions.map((t: any) => (
+                                {summary!.transactions.map((t: { id: string; createdAt: string; appointment?: { customer: { name: string } } | null; amount: number }) => (
                                     <TableRow key={t.id}>
                                         <TableCell className="text-xs text-muted-foreground">
                                             {new Date(t.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

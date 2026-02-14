@@ -20,11 +20,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { UserPlus, Shield, User as UserIcon, Edit2 } from "lucide-react"
+import { UserPlus, Shield, User as UserIcon } from "lucide-react"
 import { upsertTeamMember } from "@/app/(app)/equipe/actions"
 
 interface MemberModalProps {
-    member?: any // Se houver, é modo edição
+    member?: {
+        id: string;
+        name: string;
+        email: string;
+        role: string;
+    }
     trigger?: React.ReactNode
 }
 
@@ -39,8 +44,9 @@ export function MemberModal({ member, trigger }: MemberModalProps) {
             if (result.success) {
                 setOpen(false)
             }
-        } catch (e: any) {
-            alert(e.message)
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : 'Erro desconhecido'
+            alert(message)
         } finally {
             setLoading(false)
         }

@@ -5,9 +5,6 @@ import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-// TODO: Definir horário de funcionamento na Barbearia no banco
-const BUSINESS_HOURS = { start: 8, end: 20 }
-
 export async function getDayAppointments(date: Date, barberId?: string) {
     const session = await auth()
     if (!session) return []
@@ -40,7 +37,33 @@ export async function getDayAppointments(date: Date, barberId?: string) {
         }
     })
 
-    return appointments
+    // Converter Decimal para number e Date para ISO string
+    return appointments.map(app => ({
+        ...app,
+        date: app.date.toISOString(),
+        createdAt: app.createdAt.toISOString(),
+        updatedAt: app.updatedAt.toISOString(),
+        totalPrice: app.totalPrice.toNumber(),
+        customer: {
+            ...app.customer,
+            birthDate: app.customer.birthDate?.toISOString() || null,
+            createdAt: app.customer.createdAt.toISOString(),
+            updatedAt: app.customer.updatedAt.toISOString()
+        },
+        barber: {
+            ...app.barber,
+            createdAt: app.barber.createdAt.toISOString(),
+            updatedAt: app.barber.updatedAt.toISOString()
+        },
+        services: app.services.map(s => ({
+            ...s,
+            price: s.price.toNumber(),
+            service: {
+                ...s.service,
+                price: s.service.price.toNumber()
+            }
+        }))
+    }))
 }
 
 export async function upsertAppointment(formData: FormData) {
@@ -54,7 +77,8 @@ export async function upsertAppointment(formData: FormData) {
     let customerId = formData.get('customerId') as string
     const customerName = formData.get('customerName') as string // Se for um novo cliente
     const serviceId = formData.get('serviceId') as string
-    const barberId = formData.get('barberId') as string
+    const barberIdRaw = formData.get('barberId')
+    const barberId = (typeof barberIdRaw === 'string' && barberIdRaw) ? barberIdRaw : session.user.id
     const totalPrice = formData.get('totalPrice') as string
     const paymentMethod = formData.get('paymentMethod') as string
     const paymentStatus = formData.get('paymentStatus') as string
@@ -70,7 +94,7 @@ export async function upsertAppointment(formData: FormData) {
         const newCustomer = await prisma.customer.create({
             data: {
                 name: customerName,
-                barbershopId: (session.user as any).barbershopId
+                barbershopId: session.user.barbershopId
             }
         })
         customerId = newCustomer.id
@@ -78,15 +102,15 @@ export async function upsertAppointment(formData: FormData) {
 
     if (!customerId) throw new Error("Cliente não selecionado ou nome não informado.")
 
-    const appointmentData: any = {
+    const appointmentData = {
         date,
-        barbershopId: (session.user as any).barbershopId,
+        barbershopId: session.user.barbershopId,
         customerId,
-        barberId: barberId || (session.user as any).id,
+        barberId,
         totalPrice: parseFloat(totalPrice) || 0,
         paymentMethod: paymentMethod || null,
         paymentStatus: paymentStatus || 'PENDING',
-        status: paymentStatus === 'PAID' ? 'COMPLETED' : 'SCHEDULED'
+        status: (paymentStatus === 'PAID' ? 'COMPLETED' : 'SCHEDULED') as 'COMPLETED' | 'SCHEDULED'
     }
 
     const appointment = id
@@ -111,14 +135,14 @@ export async function upsertAppointment(formData: FormData) {
         await prisma.transaction.upsert({
             where: { appointmentId: appointment.id },
             update: {
-                amount: appointment.totalPrice,
+                amount: Number(appointment.totalPrice),
                 paymentMethod: appointment.paymentMethod || 'CASH',
                 date: appointment.date,
             },
             create: {
                 appointmentId: appointment.id,
-                barbershopId: (session.user as any).barbershopId,
-                amount: appointment.totalPrice,
+                barbershopId: session.user.barbershopId,
+                amount: Number(appointment.totalPrice),
                 type: 'INCOME',
                 paymentMethod: appointment.paymentMethod || 'CASH',
                 date: appointment.date,
@@ -162,23 +186,41 @@ export async function cancelAppointment(appointmentId: string) {
 export async function getBarbershopServices() {
     const session = await auth()
     if (!session) return []
-    return prisma.service.findMany({
+    const services = await prisma.service.findMany({
         where: { barbershopId: session.user.barbershopId }
     })
+    
+    return services.map(service => ({
+        ...service,
+        price: service.price.toNumber()
+    }))
 }
 
 export async function getBarbershopTeam() {
     const session = await auth()
     if (!session) return []
-    return prisma.user.findMany({
+    const users = await prisma.user.findMany({
         where: { barbershopId: session.user.barbershopId }
     })
+    
+    return users.map(user => ({
+        ...user,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString()
+    }))
 }
 
 export async function getBarbershopCustomers() {
     const session = await auth()
     if (!session) return []
-    return prisma.customer.findMany({
+    const customers = await prisma.customer.findMany({
         where: { barbershopId: session.user.barbershopId }
     })
+    
+    return customers.map(customer => ({
+        ...customer,
+        birthDate: customer.birthDate?.toISOString() || null,
+        createdAt: customer.createdAt.toISOString(),
+        updatedAt: customer.updatedAt.toISOString()
+    }))
 }

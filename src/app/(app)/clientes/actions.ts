@@ -8,10 +8,17 @@ export async function getCustomers() {
     const session = await auth()
     if (!session) return []
 
-    return prisma.customer.findMany({
+    const customers = await prisma.customer.findMany({
         where: { barbershopId: session.user.barbershopId },
         orderBy: { name: 'asc' }
     })
+
+    return customers.map(customer => ({
+        ...customer,
+        birthDate: customer.birthDate?.toISOString() || null,
+        createdAt: customer.createdAt.toISOString(),
+        updatedAt: customer.updatedAt.toISOString()
+    }))
 }
 
 export async function createCustomer(formData: FormData) {

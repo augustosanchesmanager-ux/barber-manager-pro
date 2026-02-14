@@ -1,4 +1,3 @@
-import { auth } from "@/auth"
 import { formatCurrency } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { getAtendimentosHistory } from "./actions"
@@ -9,7 +8,6 @@ export default async function AtendimentosPage(props: {
     searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
     const searchParams = await props.searchParams
-    const session = await auth()
 
     const startDate = searchParams.startDate
     const endDate = searchParams.endDate

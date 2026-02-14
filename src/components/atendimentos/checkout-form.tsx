@@ -8,22 +8,27 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { finishCheckout } from "@/app/(app)/atendimentos/actions"
-import { Badge } from "@/components/ui/badge"
 import { formatCurrency } from "@/lib/utils"
 
 interface CheckoutFormProps {
-    appointment: any
-    products: any[]
+    appointment: {
+        id: string;
+        customer: { name: string };
+        barber: { name: string };
+        date: string;
+        services: Array<{ price: number }>;
+    }
+    products: Array<{ id: string; name: string; price: number }>
 }
 
 export function CheckoutForm({ appointment, products }: CheckoutFormProps) {
     const [paymentMethod, setPaymentMethod] = useState("CASH")
-    const [selectedProducts, setSelectedProducts] = useState<any[]>([])
+    const [selectedProducts, setSelectedProducts] = useState<Array<{ id: string; name: string; price: number; quantity: number }>>([])
     const [loading, setLoading] = useState(false)
 
     // Calcular totais
-    const servicesTotal = appointment.services.reduce((acc: number, curr: any) => acc + Number(curr.price), 0)
-    const productsTotal = selectedProducts.reduce((acc: number, curr: any) => acc + (Number(curr.price) * curr.quantity), 0)
+    const servicesTotal = appointment.services.reduce((acc: number, curr) => acc + Number(curr.price), 0)
+    const productsTotal = selectedProducts.reduce((acc: number, curr) => acc + (Number(curr.price) * curr.quantity), 0)
     const totalAmount = servicesTotal + productsTotal
 
     const handleAddProduct = (productId: string) => {

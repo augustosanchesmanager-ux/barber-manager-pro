@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 
 interface ExportCsvButtonProps {
-    data: any[]
+    data: Array<{ id: string; date: string; description: string; paymentMethod: string; type: string; amount: number }>
 }
 
 export function ExportCsvButton({ data }: ExportCsvButtonProps) {

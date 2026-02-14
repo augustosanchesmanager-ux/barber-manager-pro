@@ -4,8 +4,6 @@ import { NextResponse } from "next/server"
 export default auth((req) => {
     const isLoggedIn = !!req.auth
     const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard")
-    const isOnLogin = req.nextUrl.pathname.startsWith("/login")
-    const isOnRegister = req.nextUrl.pathname.startsWith("/register")
     const isOnAdmin = req.nextUrl.pathname.startsWith("/admin")
 
     // Proteção para rotas /admin (apenas SUPER_ADMIN)
@@ -24,7 +22,7 @@ export default auth((req) => {
         return NextResponse.redirect(new URL("/login", req.nextUrl))
     }
 
-    if (isOnLogin) {
+    if (req.nextUrl.pathname.startsWith("/login")) {
         if (isLoggedIn) {
             return NextResponse.redirect(new URL("/dashboard", req.nextUrl))
         }

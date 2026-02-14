@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Filter, Calendar, Users } from "lucide-react"
 
 interface HistoryFiltersProps {
-    team: any[]
+    team: Array<{ id: string; name: string }>
 }
 
 export function HistoryFilters({ team }: HistoryFiltersProps) {

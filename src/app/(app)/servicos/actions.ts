@@ -34,7 +34,17 @@ export async function deleteService(id: string) {
     const session = await auth()
     if (!session || session.user.role !== 'MANAGER') throw new Error("Acesso negado")
 
-    await prisma.service.delete({ where: { id } })
+    const result = await prisma.service.deleteMany({ 
+        where: { 
+            id,
+            barbershopId: session.user.barbershopId
+        } 
+    })
+    
+    if (result.count === 0) {
+        throw new Error("Serviço não encontrado ou não pertence à sua barbearia")
+    }
+    
     revalidatePath('/servicos')
 }
 
@@ -42,8 +52,13 @@ export async function getServices() {
     const session = await auth()
     if (!session) return []
 
-    return prisma.service.findMany({
+    const services = await prisma.service.findMany({
         where: { barbershopId: session.user.barbershopId },
         orderBy: { name: 'asc' }
     })
+
+    return services.map(s => ({
+        ...s,
+        price: s.price.toNumber()
+    }))
 }

@@ -9,7 +9,7 @@ export async function getTeam() {
     const session = await auth()
     if (!session) return []
 
-    return prisma.user.findMany({
+    const users = await prisma.user.findMany({
         where: {
             barbershopId: session.user.barbershopId
         },
@@ -17,6 +17,12 @@ export async function getTeam() {
             name: 'asc'
         }
     })
+
+    return users.map(user => ({
+        ...user,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString()
+    }))
 }
 
 export async function upsertTeamMember(formData: FormData) {
@@ -35,7 +41,7 @@ export async function upsertTeamMember(formData: FormData) {
         throw new Error("Campos obrigatórios ausentes.")
     }
 
-    const data: any = {
+    const data: Record<string, string> = {
         name,
         email,
         role,
@@ -68,7 +74,10 @@ export async function upsertTeamMember(formData: FormData) {
 
             await prisma.user.create({
                 data: {
-                    ...data,
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+                    role: data.role,
                     barbershopId: session.user.barbershopId,
                     status: 'ACTIVE' // Membros da equipe criados pelo gestor já nascem ativos
                 }
@@ -77,11 +86,12 @@ export async function upsertTeamMember(formData: FormData) {
 
         revalidatePath('/equipe')
         return { success: true }
-    } catch (error: any) {
-        if (error.code === 'P2002') {
+    } catch (error: unknown) {
+        if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
             throw new Error("Este e-mail já está sendo utilizado.")
         }
-        throw new Error("Erro ao salvar membro da equipe: " + error.message)
+        const message = error instanceof Error ? error.message : 'Erro desconhecido'
+        throw new Error("Erro ao salvar membro da equipe: " + message)
     }
 }
 

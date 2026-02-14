@@ -119,7 +119,15 @@ export default async function DashboardPage() {
                             </p>
                         ) : (
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {metrics.todayAppointments.map((app: any) => (
+                                {metrics.todayAppointments.map((app: { 
+                                    id: string; 
+                                    date: string; 
+                                    paymentStatus: string; 
+                                    customer: { name: string }; 
+                                    barber: { name: string }; 
+                                    services: Array<{ id: string; service: { name: string } }>; 
+                                    totalPrice: number 
+                                }) => (
                                     <div key={app.id} className="flex flex-col p-4 border rounded-lg bg-card hover:shadow-md transition-shadow">
                                         <div className="flex justify-between items-start mb-2">
                                             <span className="text-lg font-bold">
@@ -136,7 +144,7 @@ export default async function DashboardPage() {
                                                 Barbeiro: {app.barber.name}
                                             </p>
                                             <div className="pt-2 flex flex-wrap gap-1">
-                                                {app.services.map((s: any) => (
+                                                {app.services.map((s: { id: string; service: { name: string } }) => (
                                                     <span key={s.id} className="text-[10px] bg-muted px-1.5 py-0.5 rounded">
                                                         {s.service.name}
                                                     </span>
@@ -176,7 +184,7 @@ export default async function DashboardPage() {
                                     Nenhum agendamento futuro.
                                 </p>
                             ) : (
-                                metrics.nextAppointments.map((app: any) => (
+                                metrics.nextAppointments.map((app: { id: string; customer: { name: string }; date: string; totalPrice: number }) => (
                                     <div key={app.id} className="flex items-center">
                                         <div className="space-y-1">
                                             <p className="text-sm font-medium leading-none">{app.customer.name}</p>

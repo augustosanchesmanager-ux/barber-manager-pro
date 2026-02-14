@@ -4,7 +4,7 @@ import { getAllBarbershops } from "./actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Users, Calendar, DollarSign } from "lucide-react"
+import { Building2, Users, Calendar } from "lucide-react"
 
 export default async function AdminBarbershopsPage() {
     const session = await auth()

@@ -3,7 +3,6 @@
 import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 
 export async function getTodayData() {
     const session = await auth()
@@ -28,12 +27,26 @@ export async function getTodayData() {
     if (existingClose) {
         return {
             status: 'CLOSED',
-            data: existingClose
+            data: {
+                ...existingClose,
+                date: existingClose.date.toISOString(),
+                createdAt: existingClose.createdAt.toISOString(),
+                updatedAt: existingClose.updatedAt.toISOString(),
+                totalCash: existingClose.totalCash.toNumber(),
+                totalCard: existingClose.totalCard.toNumber(),
+                totalPix: existingClose.totalPix.toNumber(),
+                totalAmount: existingClose.totalAmount.toNumber(),
+                user: {
+                    ...existingClose.user,
+                    createdAt: existingClose.user.createdAt.toISOString(),
+                    updatedAt: existingClose.user.updatedAt.toISOString()
+                }
+            }
         }
     }
 
     // 2. Se não fechou, buscar transações do dia (Entradas e Saídas)
-    const transactions = await prisma.transaction.findMany({
+    const transactionsRaw = await prisma.transaction.findMany({
         where: {
             barbershopId: session.user.barbershopId,
             date: { gte: startOfDay, lte: endOfDay },
@@ -42,12 +55,27 @@ export async function getTodayData() {
         orderBy: { date: 'desc' }
     })
 
+    // Converter Decimal para number e serializar Date
+    const transactions = transactionsRaw.map(t => ({
+        id: t.id,
+        createdAt: t.createdAt.toISOString(),
+        date: t.date.toISOString(),
+        type: t.type,
+        paymentMethod: t.paymentMethod,
+        amount: t.amount.toNumber(),
+        appointment: t.appointment ? {
+            customer: {
+                name: t.appointment.customer.name
+            }
+        } : null
+    }))
+
     let totalCash = 0
     let totalCard = 0
     let totalPix = 0
 
     for (const t of transactions) {
-        const amount = Number(t.amount)
+        const amount = t.amount
         const method = t.paymentMethod || 'CASH'
         const multiplier = t.type === 'INCOME' ? 1 : -1
 
@@ -83,7 +111,7 @@ export async function performDailyClose(observations: string) {
     await prisma.dailyClose.create({
         data: {
             barbershopId: session.user.barbershopId,
-            userId: (session.user as any).id,
+            userId: session.user.id,
             date: new Date(),
             totalCash,
             totalCard,

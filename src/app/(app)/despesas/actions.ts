@@ -23,7 +23,7 @@ export async function createExpense(data: {
             paymentMethod: data.paymentMethod || 'CASH',
             description: data.description,
             date: data.date || new Date(),
-        } as any
+        }
     })
 
     revalidatePath('/despesas')
@@ -55,7 +55,7 @@ export async function getExpenses() {
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
-    return await prisma.transaction.findMany({
+    const expenses = await prisma.transaction.findMany({
         where: {
             barbershopId: session.user.barbershopId,
             type: 'EXPENSE',
@@ -63,4 +63,12 @@ export async function getExpenses() {
         },
         orderBy: { date: 'desc' }
     })
+
+    return expenses.map(expense => ({
+        ...expense,
+        amount: expense.amount.toNumber(),
+        date: expense.date.toISOString(),
+        createdAt: expense.createdAt.toISOString(),
+        updatedAt: expense.updatedAt.toISOString()
+    }))
 }

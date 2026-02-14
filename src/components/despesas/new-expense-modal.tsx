@@ -44,7 +44,7 @@ export function NewExpenseModal() {
                 date: dateInput ? new Date(dateInput) : new Date()
             })
             setOpen(false)
-        } catch (e) {
+        } catch {
             alert("Erro ao salvar despesa")
         } finally {
             setLoading(false)

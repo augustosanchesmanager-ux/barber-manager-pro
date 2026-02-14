@@ -28,5 +28,9 @@ export async function getAllBarbershops() {
         }
     })
 
-    return barbershops
+    return barbershops.map(barbershop => ({
+        ...barbershop,
+        createdAt: barbershop.createdAt.toISOString(),
+        updatedAt: barbershop.updatedAt.toISOString()
+    }))
 }

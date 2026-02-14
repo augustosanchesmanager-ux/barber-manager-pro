@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { registerBarbershop } from "./actions"
 import Link from "next/link"
-import { Scissors } from "lucide-react"
 import { PlanSelection } from "@/components/auth/plan-selection"
 
 export default function RegisterPage() {

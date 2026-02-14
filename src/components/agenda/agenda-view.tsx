@@ -2,21 +2,21 @@
 
 import { useState, useEffect } from "react"
 import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { getDayAppointments, cancelAppointment } from "@/app/(app)/agenda/actions"
 import { AppointmentModal } from "./appointment-modal"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Trash2, DollarSign, Filter, Users, Edit2, CheckCircle2, Clock } from "lucide-react"
+import { Trash2, Filter, Users, Edit2, CheckCircle2, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 
 interface AgendaViewProps {
-    initialServices: any[]
-    initialTeam: any[]
-    initialCustomers: any[]
+    initialServices: Array<{ id: string; name: string; price: number }>
+    initialTeam: Array<{ id: string; name: string }>
+    initialCustomers: Array<{ id: string; name: string }>
     userRole?: string
 }
 
@@ -25,25 +25,32 @@ const HOURS = Array.from({ length: 13 }, (_, i) => i + 8)
 
 export function AgendaView({ initialServices, initialTeam, initialCustomers, userRole }: AgendaViewProps) {
     const [date, setDate] = useState<Date | undefined>(new Date())
-    const [appointments, setAppointments] = useState<any[]>([])
-    const [loading, setLoading] = useState(false)
+    const [appointments, setAppointments] = useState<Array<{
+        id: string;
+        date: string;
+        status: string;
+        paymentStatus: string;
+        paymentMethod: string | null;
+        totalPrice: number;
+        customer: { id: string; name: string };
+        barber: { id: string; name: string };
+        services: Array<{ id: string; service: { id: string; name: string } }>;
+    }>>([])
     const [selectedBarber, setSelectedBarber] = useState<string>("ALL")
 
     const fetchAppointments = async (selectedDate: Date, barberId: string) => {
-        setLoading(true)
         try {
             const data = await getDayAppointments(selectedDate, barberId)
             setAppointments(data)
         } catch (error) {
             console.error("Erro ao buscar agendamentos", error)
-        } finally {
-            setLoading(false)
         }
     }
 
     useEffect(() => {
         if (date) {
-            fetchAppointments(date, selectedBarber)
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            void fetchAppointments(date, selectedBarber)
         }
     }, [date, selectedBarber])
 
@@ -151,7 +158,16 @@ export function AgendaView({ initialServices, initialTeam, initialCustomers, use
                                             services={initialServices}
                                             team={initialTeam}
                                             customers={initialCustomers}
-                                            appointment={app}
+                                            appointment={{
+                                                id: app.id,
+                                                date: app.date,
+                                                customerId: app.customer.id,
+                                                barberId: app.barber.id,
+                                                paymentStatus: app.paymentStatus,
+                                                paymentMethod: app.paymentMethod,
+                                                totalPrice: app.totalPrice,
+                                                services: app.services.map(s => ({ serviceId: s.service.id }))
+                                            }}
                                             onSuccess={handleSuccess}
                                             trigger={
                                                 <div
@@ -181,7 +197,7 @@ export function AgendaView({ initialServices, initialTeam, initialCustomers, use
                                                             <div className="font-bold text-base">{app.customer.name}</div>
                                                             <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
                                                                 <span className="font-semibold text-foreground/80">
-                                                                    {app.services.map((s: any) => s.service.name).join(", ")}
+                                                                    {app.services.map((s) => s.service.name).join(", ")}
                                                                 </span>
                                                                 <span>•</span>
                                                                 <span className="flex items-center gap-1">

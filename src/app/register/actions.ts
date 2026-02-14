@@ -1,10 +1,7 @@
 'use server'
 
-import { auth } from "@/auth"
-console.log("Register actions loaded")
 import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
-import { signIn } from "@/auth"
 import { redirect } from "next/navigation"
 
 function generateSlug(name: string): string {
@@ -73,8 +70,9 @@ export async function registerBarbershop(formData: FormData) {
         })
 
         console.log("Barbearia criada com sucesso:", barbershop.slug)
-    } catch (error: any) {
-        console.error("ERRO NO REGISTRO:", error.message)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Erro desconhecido'
+        console.error("ERRO NO REGISTRO:", message)
         throw error // Repassa para o Next.js lidar (ou mostrar no erro)
     }
 

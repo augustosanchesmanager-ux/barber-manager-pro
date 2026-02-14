@@ -1,5 +1,4 @@
 import 'dotenv/config'
-// @ts-ignore
 import prisma from '../src/lib/prisma'
 import bcrypt from 'bcryptjs'
 

@@ -56,7 +56,7 @@ export async function getDashboardMetrics() {
     })
 
     // 3. Atendimentos Hoje
-    const todayAppointments = await prisma.appointment.findMany({
+    const todayAppointmentsRaw = await prisma.appointment.findMany({
         where: {
             barbershopId: session.user.barbershopId,
             date: { gte: startOfDay, lte: endOfDay },
@@ -70,10 +70,37 @@ export async function getDashboardMetrics() {
         orderBy: { date: 'asc' }
     })
 
+    const todayAppointments = todayAppointmentsRaw.map(app => ({
+        ...app,
+        date: app.date.toISOString(),
+        createdAt: app.createdAt.toISOString(),
+        updatedAt: app.updatedAt.toISOString(),
+        totalPrice: app.totalPrice.toNumber(),
+        customer: {
+            ...app.customer,
+            birthDate: app.customer.birthDate?.toISOString() || null,
+            createdAt: app.customer.createdAt.toISOString(),
+            updatedAt: app.customer.updatedAt.toISOString()
+        },
+        barber: {
+            ...app.barber,
+            createdAt: app.barber.createdAt.toISOString(),
+            updatedAt: app.barber.updatedAt.toISOString()
+        },
+        services: app.services.map(s => ({
+            ...s,
+            price: s.price.toNumber(),
+            service: {
+                ...s.service,
+                price: s.service.price.toNumber()
+            }
+        }))
+    }))
+
     const appointmentsTodayCount = todayAppointments.length
 
     // 4. Próximos Agendamentos (Top 5)
-    const nextAppointments = await prisma.appointment.findMany({
+    const nextAppointmentsRaw = await prisma.appointment.findMany({
         where: {
             barbershopId: session.user.barbershopId,
             date: { gte: new Date() }, // Futuros
@@ -87,6 +114,33 @@ export async function getDashboardMetrics() {
             barber: true
         }
     })
+
+    const nextAppointments = nextAppointmentsRaw.map(app => ({
+        ...app,
+        date: app.date.toISOString(),
+        createdAt: app.createdAt.toISOString(),
+        updatedAt: app.updatedAt.toISOString(),
+        totalPrice: app.totalPrice.toNumber(),
+        customer: {
+            ...app.customer,
+            birthDate: app.customer.birthDate?.toISOString() || null,
+            createdAt: app.customer.createdAt.toISOString(),
+            updatedAt: app.customer.updatedAt.toISOString()
+        },
+        barber: {
+            ...app.barber,
+            createdAt: app.barber.createdAt.toISOString(),
+            updatedAt: app.barber.updatedAt.toISOString()
+        },
+        services: app.services.map(s => ({
+            ...s,
+            price: s.price.toNumber(),
+            service: {
+                ...s.service,
+                price: s.service.price.toNumber()
+            }
+        }))
+    }))
 
     // 5. Gráfico de Faturamento (Últimos 7 dias)
     const last7Days = Array.from({ length: 7 }, (_, i) => {

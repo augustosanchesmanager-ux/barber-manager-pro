@@ -34,7 +34,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                             />
                             <Tooltip
                                 contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
-                                formatter={(value: any) => [`R$ ${Number(value || 0).toFixed(2)}`, "Faturamento"]}
+                                formatter={(value: number | string | undefined) => [`R$ ${Number(value || 0).toFixed(2)}`, "Faturamento"]}
                             />
                             <Line
                                 type="monotone"

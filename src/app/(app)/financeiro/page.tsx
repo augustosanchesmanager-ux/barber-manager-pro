@@ -1,4 +1,3 @@
-import { auth } from "@/auth"
 import { getReportTransactions } from "@/app/(app)/financeiro/actions"
 import { formatCurrency } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -91,7 +90,7 @@ export default async function FinanceiroPage({
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {transactions.map((t: any) => (
+                            {transactions.map((t: { id: string; date: string; type: string; description: string; category?: string | null; paymentMethod: string; amount: number }) => (
                                 <TableRow key={t.id}>
                                     <TableCell>{new Date(t.date).toLocaleDateString()}</TableCell>
                                     <TableCell>

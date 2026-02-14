@@ -13,7 +13,6 @@ import {
     LayoutDashboard,
     Menu,
     Package,
-    BarChart3,
     Scissors,
     Settings,
     TrendingDown,
@@ -23,7 +22,7 @@ import {
 import { useState } from 'react'
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
-    session?: any
+    session?: { user: { role?: string } } | null
 }
 
 export function Sidebar({ className, session }: SidebarProps) {
@@ -125,7 +124,7 @@ export function Sidebar({ className, session }: SidebarProps) {
         },
     ]
 
-    const RenderRoutes = (items: any[], title?: string) => (
+    const RenderRoutes = (items: Array<{ label: string; icon: React.ComponentType<{ className?: string }>; href: string; color?: string }>, title?: string) => (
         <div className="mb-4">
             {title && (
                 <h2 className="mb-2 px-4 text-xs font-semibold tracking-tight text-muted-foreground uppercase opacity-70">

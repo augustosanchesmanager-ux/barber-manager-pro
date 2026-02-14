@@ -15,7 +15,7 @@ async function main() {
     }
 
     const adapter = new PrismaLibSql({ url, authToken })
-    const prisma = new PrismaClient({ adapter } as any)
+    const prisma = new PrismaClient({ adapter: adapter as never })
 
     try {
         console.log('🔧 Conectando ao Turso para criar SUPER_ADMIN...')

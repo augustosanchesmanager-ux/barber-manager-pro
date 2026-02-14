@@ -21,16 +21,25 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Edit2, DollarSign, Wallet } from "lucide-react"
+import { Plus, DollarSign, Wallet } from "lucide-react"
 import { upsertAppointment } from "@/app/(app)/agenda/actions"
 import { format } from "date-fns"
 
 interface AppointmentModalProps {
-    services: any[]
-    team: any[]
-    customers: any[]
+    services: Array<{ id: string; name: string; price: number }>
+    team: Array<{ id: string; name: string }>
+    customers?: Array<{ id: string; name: string }>
     selectedDate?: Date
-    appointment?: any // Se houver, é edição
+    appointment?: {
+        id: string;
+        date: string;
+        customerId: string;
+        barberId: string;
+        paymentStatus: string;
+        paymentMethod?: string | null;
+        totalPrice: number;
+        services?: Array<{ serviceId: string }>;
+    }
     onSuccess: () => void
     trigger?: React.ReactNode
 }
@@ -125,7 +134,7 @@ export function AppointmentModal({ services, team, customers, selectedDate, appo
                             </SelectTrigger>
                             <SelectContent>
                                 {!appointment && <SelectItem value="NEW" className="font-bold text-primary">+ Novo Cliente (Não cadastrado)</SelectItem>}
-                                {customers?.map((c: any) => (
+                                {customers?.map((c) => (
                                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                 ))}
                             </SelectContent>

@@ -22,7 +22,16 @@ export async function getPendingRequests() {
         orderBy: { createdAt: 'desc' }
     })
 
-    return pendingBarbershops
+    return pendingBarbershops.map(barbershop => ({
+        ...barbershop,
+        createdAt: barbershop.createdAt.toISOString(),
+        updatedAt: barbershop.updatedAt.toISOString(),
+        users: barbershop.users.map(user => ({
+            ...user,
+            createdAt: user.createdAt.toISOString(),
+            updatedAt: user.updatedAt.toISOString()
+        }))
+    }))
 }
 
 export async function approveRequest(barbershopId: string) {

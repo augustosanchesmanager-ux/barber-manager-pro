@@ -14,7 +14,7 @@ export function DeleteExpenseButton({ id }: { id: string }) {
         setLoading(true)
         try {
             await deleteExpense(id)
-        } catch (e) {
+        } catch {
             alert("Erro ao excluir")
         } finally {
             setLoading(false)

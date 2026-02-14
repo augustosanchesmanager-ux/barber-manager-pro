@@ -10,11 +10,11 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 import { signOut } from 'next-auth/react'
 
-export function Header({ session }: { session: any }) {
+export function Header({ session }: { session: { user: { name?: string | null; email?: string | null } } | null }) {
     const user = session?.user
 
     return (

@@ -11,9 +11,10 @@ import { Badge } from "@/components/ui/badge"
 export default async function FinanceiroPage({
     searchParams,
 }: {
-    searchParams: { start?: string; end?: string }
+    searchParams: Promise<{ start?: string; end?: string }>
 }) {
-    const transactions = await getReportTransactions(searchParams.start, searchParams.end)
+    const params = await searchParams
+    const transactions = await getReportTransactions(params.start, params.end)
     const total = transactions.reduce((acc, curr) => {
         return acc + (curr.type === 'INCOME' ? curr.amount : -curr.amount)
     }, 0)

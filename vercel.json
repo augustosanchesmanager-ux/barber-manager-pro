@@ -1,7 +1,7 @@
 {
-  "buildCommand": "bash build.sh",
+  "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "framework": null,
+  "framework": "nextjs",
   "env": {
     "SKIP_ENV_VALIDATION": "true"
   },

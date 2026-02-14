@@ -2,8 +2,10 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import prisma from "@/lib/prisma"
+import { authConfig } from "./auth.config"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    ...authConfig,
     providers: [
         Credentials({
             name: "Credentials",
@@ -28,11 +30,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     return null
                 }
 
-                // Super Admin sempre pode logar se a conta estiver ativa
                 if (user.role === 'SUPER_ADMIN') {
                     if (user.status !== 'ACTIVE') return null
                 } else {
-                    // Outros usuários precisam que a conta E a barbearia estejam ativas
                     if (user.status !== 'ACTIVE' || !user.barbershop.isActive) {
                         return null
                     }
@@ -71,11 +71,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
             return session
         },
-    },
-    session: {
-        strategy: "jwt",
-    },
-    pages: {
-        signIn: "/login",
     },
 })

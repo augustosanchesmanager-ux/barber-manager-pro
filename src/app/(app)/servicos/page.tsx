@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getServices, deleteService } from "@/app/(app)/servicos/actions"
 import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"

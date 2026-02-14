@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getProducts, deleteProduct } from "@/app/(app)/produtos/actions"
 import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"

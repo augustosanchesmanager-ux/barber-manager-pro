@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { formatCurrency } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { getAtendimentosHistory } from "./actions"

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getTeam, deleteTeamMember } from "./actions"
 import { MemberModal } from "@/components/equipe/member-modal"
 import { auth } from "@/auth"

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getCustomers, deleteCustomer } from "./actions"
 import { CustomerModal } from "@/components/clientes/customer-modal"
 import { format } from "date-fns"

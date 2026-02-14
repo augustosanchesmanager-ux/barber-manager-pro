@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { auth } from "@/auth"
 import { getTodayData } from "@/app/(app)/caixa/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"

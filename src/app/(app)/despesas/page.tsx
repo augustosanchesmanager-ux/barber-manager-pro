@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { auth } from "@/auth"
 import { getExpenses } from "@/app/(app)/despesas/actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

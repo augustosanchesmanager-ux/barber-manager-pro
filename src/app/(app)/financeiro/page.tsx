@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getReportTransactions } from "@/app/(app)/financeiro/actions"
 import { formatCurrency } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

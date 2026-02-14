@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { AgendaView } from "@/components/agenda/agenda-view"
 import { getBarbershopServices, getBarbershopTeam, getBarbershopCustomers } from "@/app/(app)/agenda/actions"
 import { auth } from "@/auth"

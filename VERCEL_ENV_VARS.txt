@@ -1,0 +1,54 @@
+# Variáveis de Ambiente para Deploy na Vercel
+# Copie e cole estas variáveis na interface da Vercel
+
+## 1. DATABASE_URL (SQLite local - sem necessidade de Turso para começar)
+file:./dev.db
+
+## 2. AUTH_SECRET
+tKUMJKomZagympmVTioGUh+WifDuXoI29S503qY7hv8=
+
+## 3. AUTH_TRUST_HOST
+true
+
+---
+
+## Como adicionar na Vercel:
+
+1. Acesse: https://vercel.com/new
+2. Importe o repositório: barber-manager-pro  
+3. Na seção "Environment Variables", adicione as 3 variáveis acima
+4. **IMPORTANTE**: Marque as 3 opções para cada variável:
+   - ✅ Production
+   - ✅ Preview
+   - ✅ Development
+5. Clique em "Deploy"
+
+## Após o deploy:
+
+O banco SQLite será criado automaticamente. Para criar o usuário admin:
+
+1. Acesse a Vercel Console para seu projeto
+2. Vá em Settings > Environment Variables
+3. Use a função serverless para criar admin
+
+OU execute localmente:
+```bash
+npm run create-admin
+```
+
+---
+
+## NOTA SOBRE TURSO:
+
+Por enquanto, estamos usando SQLite local para evitar problemas de compatibilidade.
+Você tem um banco Turso criado que pode ser usado depois da primeira migração bem-sucedida.
+
+Dados do Turso (para uso futuro):
+- URL: libsql://barber-manager-prod-augustosanchesmanager-ux.aws-eu-west-1.turso.io  
+- Token: (guardado)
+
+Para migrar para Turso depois:
+1. Atualizar src/lib/prisma.ts com o driver adapter
+2. Atualizar DATABASE_URL na Vercel
+3. Adicionar DATABASE_AUTH_TOKEN na Vercel
+4. Redeploy

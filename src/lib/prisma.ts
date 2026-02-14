@@ -1,15 +1,6 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaLibSql } from '@prisma/adapter-libsql'
 
 const prismaClientSingleton = () => {
-    if (process.env.TURSO_AUTH_TOKEN) {
-        const adapter = new PrismaLibSql({
-            url: process.env.DATABASE_URL!,
-            authToken: process.env.TURSO_AUTH_TOKEN,
-        })
-        return new PrismaClient({ adapter: adapter as never })
-    }
-
     return new PrismaClient()
 }
 
